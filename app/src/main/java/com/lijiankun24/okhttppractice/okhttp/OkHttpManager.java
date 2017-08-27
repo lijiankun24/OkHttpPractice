@@ -1,5 +1,7 @@
 package com.lijiankun24.okhttppractice.okhttp;
 
+import android.content.Context;
+
 import com.lijiankun24.okhttppractice.okhttp.cookie.CustomCookieJar;
 
 import java.io.IOException;
@@ -23,17 +25,17 @@ public class OkHttpManager {
 
     private static OkHttpClient sHttpClient = null;
 
-    private OkHttpManager() {
+    private OkHttpManager(Context context) {
         sHttpClient = new OkHttpClient.Builder()
-                .cookieJar(new CustomCookieJar())
+                .cookieJar(new CustomCookieJar(context))
                 .build();
     }
 
-    public static OkHttpManager getInstance() {
+    public static OkHttpManager getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (OkHttpManager.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new OkHttpManager();
+                    INSTANCE = new OkHttpManager(context);
                 }
             }
         }

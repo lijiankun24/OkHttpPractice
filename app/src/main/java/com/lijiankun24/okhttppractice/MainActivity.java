@@ -29,10 +29,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void request() {
-        OkHttpManager.getInstance().addGetStringRequest(mUrl, new OnHttpListener<String>() {
+        OkHttpManager.getInstance(MainActivity.this).addGetStringRequest(mUrl, new OnHttpListener<String>() {
             @Override
             public void onSuccess(String result) {
-                L.i("onSuccess " + result);
+                L.i("onSuccess ");
             }
 
             @Override
