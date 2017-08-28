@@ -2,13 +2,9 @@ package com.lijiankun24.okhttppractice.okhttp.cookie;
 
 import android.content.Context;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
@@ -30,22 +26,23 @@ public class CustomCookieJar implements CookieJar {
 
     @Override
     public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-        Map<String, List<String>> map = new HashMap<>();
-        List<String> cookieValue = new ArrayList<>();
-        for (Cookie cookie : cookies) {
-            cookieValue.add(cookie.toString());
-        }
-        map.put("Set-Cookie", cookieValue);
-        try {
-            CustomCookieManager.getInstance(mContext).put(httpurlToURI(url), map);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        CustomCookieManager.getInstance(mContext).put(httpurlToURI(url), cookies);
+//        Map<String, List<String>> map = new HashMap<>();
+//        List<String> cookieValue = new ArrayList<>();
+//        for (Cookie cookie : cookies) {
+//            cookieValue.add(cookie.toString());
+//        }
+//        map.put("Set-Cookie", cookieValue);
+//        try {
+//            CustomCookieManager.getInstance(mContext).put(httpurlToURI(url), map);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
     public List<Cookie> loadForRequest(HttpUrl url) {
-        return new ArrayList<>();
+        return CustomCookieManager.getInstance(mContext).get(httpurlToURI(url));
     }
 
     private URI httpurlToURI(HttpUrl httpUrl) {

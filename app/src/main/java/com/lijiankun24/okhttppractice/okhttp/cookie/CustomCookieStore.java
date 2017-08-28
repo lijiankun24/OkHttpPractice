@@ -6,10 +6,10 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.lijiankun24.okhttppractice.utils.L;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.net.CookieStore;
 import java.net.HttpCookie;
@@ -29,11 +29,9 @@ import java.util.Map;
 
 public class CustomCookieStore implements CookieStore {
 
-    private final Map<String, List<HttpCookie>> mCookieCache = new HashMap<>();
+    private final Map<URI, List<HttpCookie>> mCookieCache = new HashMap<>();
 
     private final String COOKIE_STORE = "cookie_store";
-
-    private final String CUSTOM_DOMAIN = "jianshu.com";
 
     private static CustomCookieStore INSTANCE = null;
 
@@ -48,18 +46,16 @@ public class CustomCookieStore implements CookieStore {
 
     @TargetApi(19)
     private void init() {
-        Map<String, Object> persistent = (Map<String, Object>) mPreferences.getAll();
-        for (Map.Entry<String, Object> entry : persistent.entrySet()) {
-            String uri = entry.getKey();
-            List<HttpCookie> value = new ArrayList<>();
+        Map<String, String> persistent = (Map<String, String>) mPreferences.getAll();
+        for (Map.Entry<String, String> entry : persistent.entrySet()) {
+            URI uri;
+            List<HttpCookie> value;
             try {
-                JSONArray array = new JSONArray(entry.getValue());
-                for (int i = 0; i < array.length(); i++) {
-                    HttpCookie cookie = (HttpCookie) array.get(i);
-                    value.add(cookie);
-                }
-                mCookieCache.put(uri.toString(), value);
-            } catch (JSONException e) {
+                uri = mGson.fromJson(entry.getKey(), URI.class);
+                value = mGson.fromJson(entry.getValue(), new TypeToken<List<HttpCookie>>(){
+                }.getType());
+                mCookieCache.put(uri, value);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -82,7 +78,8 @@ public class CustomCookieStore implements CookieStore {
             L.e("cookie == null or uri == null in CustomCookieStore");
             return;
         }
-        List<HttpCookie> cookieList = mCookieCache.get(uri.toString());
+        uri = cookiesUri(uri);
+        List<HttpCookie> cookieList = mCookieCache.get(uri);
         if (cookieList == null || cookieList.size() == 0) {
             cookieList = new ArrayList<>();
         }
@@ -90,16 +87,16 @@ public class CustomCookieStore implements CookieStore {
             cookieList.remove(cookie);
         }
         cookieList.add(cookie);
-        mCookieCache.put(uri.toString(), cookieList);
+        mCookieCache.put(uri, cookieList);
         refreshCookie(uri);
     }
 
     private void refreshCookie(URI uri) {
-        uri = cookiesUri(uri);
-        List<HttpCookie> cookieList = mCookieCache.get(uri.toString());
-        String cookieString = httpCookieToJson(cookieList);
+        List<HttpCookie> cookieList = mCookieCache.get(uri);
+        String key = mGson.toJson(uri).toString();
+        String value = mGson.toJson(cookieList).toString();
         mPreferences.edit()
-                .putString(uri.toString(), cookieString)
+                .putString(key, value)
                 .commit();
     }
 
@@ -110,8 +107,8 @@ public class CustomCookieStore implements CookieStore {
             L.e("uri == null in CustomCookieStore.get(URI)");
             return result;
         }
-
-        List<HttpCookie> cookies = mCookieCache.get(uri.toString());
+        uri = cookiesUri(uri);
+        List<HttpCookie> cookies = mCookieCache.get(uri);
         if (cookies != null && cookies.size() > 0) {
             for (Iterator<HttpCookie> iterator = cookies.iterator(); iterator.hasNext(); ) {
                 HttpCookie cookie = iterator.next();
