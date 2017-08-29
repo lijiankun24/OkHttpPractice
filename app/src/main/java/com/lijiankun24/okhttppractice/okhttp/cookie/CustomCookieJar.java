@@ -27,17 +27,6 @@ public class CustomCookieJar implements CookieJar {
     @Override
     public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
         CustomCookieManager.getInstance(mContext).put(httpurlToURI(url), cookies);
-//        Map<String, List<String>> map = new HashMap<>();
-//        List<String> cookieValue = new ArrayList<>();
-//        for (Cookie cookie : cookies) {
-//            cookieValue.add(cookie.toString());
-//        }
-//        map.put("Set-Cookie", cookieValue);
-//        try {
-//            CustomCookieManager.getInstance(mContext).put(httpurlToURI(url), map);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
     @Override

@@ -3,18 +3,14 @@ package com.lijiankun24.okhttppractice.okhttp.cookie;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lijiankun24.okhttppractice.utils.L;
 
-import org.json.JSONArray;
-
 import java.net.CookieStore;
 import java.net.HttpCookie;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,11 +23,11 @@ import java.util.Map;
  * Created by lijiankun on 17/8/25.
  */
 
-public class CustomCookieStore implements CookieStore {
+class CustomCookieStore implements CookieStore {
 
     private final Map<URI, List<HttpCookie>> mCookieCache = new HashMap<>();
 
-    private final String COOKIE_STORE = "cookie_store";
+    private static final String COOKIE_STORE = "cookie_store";
 
     private static CustomCookieStore INSTANCE = null;
 
@@ -52,7 +48,7 @@ public class CustomCookieStore implements CookieStore {
             List<HttpCookie> value;
             try {
                 uri = mGson.fromJson(entry.getKey(), URI.class);
-                value = mGson.fromJson(entry.getValue(), new TypeToken<List<HttpCookie>>(){
+                value = mGson.fromJson(entry.getValue(), new TypeToken<List<HttpCookie>>() {
                 }.getType());
                 mCookieCache.put(uri, value);
             } catch (Exception e) {
@@ -61,7 +57,7 @@ public class CustomCookieStore implements CookieStore {
         }
     }
 
-    public static CustomCookieStore getInstance(Context context) {
+    static CustomCookieStore getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (CustomCookieStore.class) {
                 if (INSTANCE == null) {
@@ -78,7 +74,6 @@ public class CustomCookieStore implements CookieStore {
             L.e("cookie == null or uri == null in CustomCookieStore");
             return;
         }
-        uri = cookiesUri(uri);
         List<HttpCookie> cookieList = mCookieCache.get(uri);
         if (cookieList == null || cookieList.size() == 0) {
             cookieList = new ArrayList<>();
@@ -91,15 +86,6 @@ public class CustomCookieStore implements CookieStore {
         refreshCookie(uri);
     }
 
-    private void refreshCookie(URI uri) {
-        List<HttpCookie> cookieList = mCookieCache.get(uri);
-        String key = mGson.toJson(uri).toString();
-        String value = mGson.toJson(cookieList).toString();
-        mPreferences.edit()
-                .putString(key, value)
-                .commit();
-    }
-
     @Override
     public List<HttpCookie> get(URI uri) {
         List<HttpCookie> result = new ArrayList<>();
@@ -107,7 +93,6 @@ public class CustomCookieStore implements CookieStore {
             L.e("uri == null in CustomCookieStore.get(URI)");
             return result;
         }
-        uri = cookiesUri(uri);
         List<HttpCookie> cookies = mCookieCache.get(uri);
         if (cookies != null && cookies.size() > 0) {
             for (Iterator<HttpCookie> iterator = cookies.iterator(); iterator.hasNext(); ) {
@@ -134,30 +119,40 @@ public class CustomCookieStore implements CookieStore {
 
     @Override
     public boolean remove(URI uri, HttpCookie cookie) {
-        return false;
+        boolean isRemoved = false;
+        if (uri == null || cookie == null) {
+            L.e("cookie == null or uri == null in CustomCookieStore");
+            return false;
+        }
+        List<HttpCookie> cookieList = mCookieCache.get(uri);
+        for (Iterator<HttpCookie> iterator = cookieList.iterator(); iterator.hasNext(); ) {
+            HttpCookie curCookie = iterator.next();
+            if (cookie.equals(curCookie)) {
+                iterator.remove();
+                isRemoved = true;
+            }
+        }
+        if (isRemoved) {
+            refreshCookie(uri);
+        }
+        return isRemoved;
     }
 
     @Override
     public boolean removeAll() {
-        return false;
+        mCookieCache.clear();
+        mPreferences.edit()
+                .clear()
+                .apply();
+        return true;
     }
 
-    private URI cookiesUri(URI uri) {
-        try {
-            return new URI("http", uri.getHost(), null, null);
-        } catch (URISyntaxException e) {
-            return uri; // probably a URI with no host
-        }
-    }
-
-    private String httpCookieToJson(@NonNull List<HttpCookie> cookieList) {
-        if (cookieList == null || cookieList.size() == 0) {
-            return null;
-        }
-        JSONArray array = new JSONArray();
-        for (HttpCookie cookie : cookieList) {
-            array.put(cookie);
-        }
-        return array.toString();
+    private void refreshCookie(URI uri) {
+        List<HttpCookie> cookieList = mCookieCache.get(uri);
+        String key = mGson.toJson(uri).toString();
+        String value = mGson.toJson(cookieList).toString();
+        mPreferences.edit()
+                .putString(key, value)
+                .apply();
     }
 }

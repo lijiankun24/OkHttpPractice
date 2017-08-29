@@ -2,7 +2,6 @@ package com.lijiankun24.okhttppractice.okhttp.cookie;
 
 import android.content.Context;
 
-import com.google.gson.Gson;
 import com.lijiankun24.okhttppractice.utils.L;
 
 import java.io.IOException;
@@ -24,13 +23,11 @@ import okhttp3.Cookie;
  * Created by lijiankun on 17/8/25.
  */
 
-public class CustomCookieManager extends CookieManager {
+class CustomCookieManager extends CookieManager {
 
     private static CustomCookieManager INSTANCE = null;
 
     private CookieStore mCookieStore = null;
-
-    private Gson mGson = new Gson();
 
     private CustomCookieManager(Context context) {
         this(CustomCookieStore.getInstance(context));
@@ -45,7 +42,7 @@ public class CustomCookieManager extends CookieManager {
         super(store, cookiePolicy);
     }
 
-    public static CustomCookieManager getInstance(Context context) {
+    static CustomCookieManager getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (CustomCookieManager.class) {
                 if (INSTANCE == null) {
@@ -56,7 +53,7 @@ public class CustomCookieManager extends CookieManager {
         return INSTANCE;
     }
 
-    public void put(URI uri, List<Cookie> cookieList) {
+    void put(URI uri, List<Cookie> cookieList) {
         if (uri == null || cookieList == null || cookieList.size() == 0) {
             L.e("uri == null or cookie == null in CustomCookieStore");
         }
@@ -64,7 +61,6 @@ public class CustomCookieManager extends CookieManager {
         Map<String, List<String>> map = new HashMap<>();
         List<String> value = new ArrayList<>();
         for (Cookie cookie : cookieList) {
-//            value.add(mGson.toJson(cookie, Cookie.class));
             value.add(cookie.toString());
         }
         map.put("Set-Cookie", value);
@@ -75,10 +71,39 @@ public class CustomCookieManager extends CookieManager {
         }
     }
 
-    public List<Cookie> get(URI uri) {
+    List<Cookie> get(URI uri) {
         List<Cookie> result = new ArrayList<>();
         List<HttpCookie> cookieList = mCookieStore.get(uri);
-        L.i("===== ");
+        for (HttpCookie cookie : cookieList) {
+            Cookie cookie1 = httpCookieToCookie(cookie);
+            result.add(cookie1);
+        }
         return result;
+    }
+
+    void remove(URI uri, Cookie cookie) {
+        mCookieStore.remove(uri, cookieToHttpCookie(cookie));
+    }
+
+    void removeAll() {
+        mCookieStore.removeAll();
+    }
+
+    private HttpCookie cookieToHttpCookie(Cookie cookie) {
+        HttpCookie httpCookie = new HttpCookie(cookie.name(), cookie.value());
+        httpCookie.setDomain(cookie.domain());
+        httpCookie.setPath(cookie.path());
+        httpCookie.setMaxAge(cookie.expiresAt());
+        return httpCookie;
+    }
+
+    private Cookie httpCookieToCookie(HttpCookie cookie) {
+        return new Cookie.Builder()
+                .name(cookie.getName())
+                .value(cookie.getValue())
+                .domain(cookie.getDomain())
+                .path(cookie.getPath())
+                .expiresAt(cookie.getMaxAge())
+                .build();
     }
 }
