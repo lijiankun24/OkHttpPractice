@@ -3,6 +3,7 @@ package com.lijiankun24.okhttppractice.okhttp;
 import android.content.Context;
 
 import com.lijiankun24.okhttppractice.okhttp.cookie.CustomCookieJar;
+import com.lijiankun24.okhttppractice.okhttp.interceptor.HeaderInterceptor;
 
 import java.io.IOException;
 
@@ -28,6 +29,7 @@ public class OkHttpManager {
     private OkHttpManager(Context context) {
         sHttpClient = new OkHttpClient.Builder()
                 .cookieJar(new CustomCookieJar(context))
+                .addInterceptor(new HeaderInterceptor())
                 .build();
     }
 
