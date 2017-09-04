@@ -12,9 +12,16 @@ import com.lijiankun24.okhttppractice.utils.MobileUtil;
 
 public class MyApplication extends Application {
 
+    private static Application INSTANCE = null;
+
+    public static Application getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
+        INSTANCE = this;
         MobileUtil.init(this);
     }
 }

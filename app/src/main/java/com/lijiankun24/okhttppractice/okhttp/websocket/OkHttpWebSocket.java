@@ -12,12 +12,12 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
 /**
- * TestOkHttpWebSocket.java
+ * OkHttpWebSocket.java
  * <p>
  * Created by lijiankun on 17/9/1.
  */
 
-public class TestOkHttpWebSocket {
+public class OkHttpWebSocket {
 
     private static final MockWebServer sWebServer = new MockWebServer();
 
@@ -28,7 +28,7 @@ public class TestOkHttpWebSocket {
     private static Timer sTimer = null;
 
     public static void main(String[] args) {
-        System.out.println("========== TestOkHttpWebSocket main");
+        System.out.println("========== OkHttpWebSocket main");
         initMockServer();
         initWebSocketClient("ws://" + sWebServer.getHostName() + ":" + sWebServer.getPort() + "/");
     }

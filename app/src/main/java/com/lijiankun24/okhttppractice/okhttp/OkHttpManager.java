@@ -2,6 +2,9 @@ package com.lijiankun24.okhttppractice.okhttp;
 
 import android.content.Context;
 
+import com.lijiankun24.okhttppractice.okhttp.cache.CustomCache;
+import com.lijiankun24.okhttppractice.okhttp.cache.LocalCacheInterceptor;
+import com.lijiankun24.okhttppractice.okhttp.cache.NetCacheInterceptor;
 import com.lijiankun24.okhttppractice.okhttp.cookie.CustomCookieJar;
 import com.lijiankun24.okhttppractice.okhttp.interceptor.HeaderInterceptor;
 import com.lijiankun24.okhttppractice.okhttp.interceptor.LogInterceptor;
@@ -29,7 +32,10 @@ public class OkHttpManager {
 
     private OkHttpManager(Context context) {
         sHttpClient = new OkHttpClient.Builder()
+                .cache(CustomCache.getCache())
                 .cookieJar(new CustomCookieJar(context))
+                .addNetworkInterceptor(new NetCacheInterceptor())
+                .addInterceptor(new LocalCacheInterceptor())
                 .addInterceptor(new HeaderInterceptor())
                 .addInterceptor(new LogInterceptor())
                 .build();
