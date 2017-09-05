@@ -38,10 +38,10 @@ public class LogInterceptor implements Interceptor {
                 .concat("\nnetwork code ==== " + response.code())
                 .concat("\nnetwork url ===== " + request.url())
                 .concat("\nduration ======== " + duration)
+                .concat("\nrequest duration ============ " + (response.receivedResponseAtMillis() - response.sentRequestAtMillis()))
                 .concat("\nrequest header == " + request.headers())
                 .concat("\nrequest ========= " + bodyToString(request.body()))
                 .concat("\nbody ============ " + buffer.clone().readString(UTF8));
-
         L.i("log is " + log);
         return response;
     }

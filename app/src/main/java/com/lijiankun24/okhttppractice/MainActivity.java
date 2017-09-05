@@ -10,7 +10,11 @@ import com.lijiankun24.okhttppractice.utils.L;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private String mUrl = "http://www.jianshu.com/u/1abe21b7ff5f";
+//    private String mUrl = "http://www.jianshu.com/u/1abe21b7ff5f";
+
+    private String mUrl = "https://kyfw.12306.cn/otn/";
+
+//    private String mUrl = "http://ke.youdao.com";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
