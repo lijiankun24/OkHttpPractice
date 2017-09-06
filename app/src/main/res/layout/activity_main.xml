@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.lijiankun24.okhttppractice.MainActivity">
+    tools:context="com.lijiankun24.okhttppractice.activity.MainActivity">
 
     <TextView
         android:id="@+id/tv_okhttp"
@@ -13,6 +13,16 @@
         android:layout_height="48dp"
         android:gravity="center"
         android:text="Send A OkHttp Request"/>
+
+    <View
+        style="@style/LineStyle"/>
+
+    <TextView
+        android:id="@+id/tv_webview"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center"
+        android:text="Click to WebViewActivity"/>
 
     <View
         style="@style/LineStyle"/>

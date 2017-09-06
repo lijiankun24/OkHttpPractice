@@ -1,9 +1,11 @@
-package com.lijiankun24.okhttppractice;
+package com.lijiankun24.okhttppractice.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import com.lijiankun24.okhttppractice.R;
 import com.lijiankun24.okhttppractice.okhttp.OkHttpManager;
 import com.lijiankun24.okhttppractice.okhttp.OnHttpListener;
 import com.lijiankun24.okhttppractice.utils.L;
@@ -29,6 +31,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.tv_okhttp:
                 request();
                 break;
+            case R.id.tv_webview:
+                startActivity(new Intent(MainActivity.this, WebViewActivity.class));
+                break;
         }
     }
 
@@ -48,5 +53,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initView() {
         findViewById(R.id.tv_okhttp).setOnClickListener(this);
+        findViewById(R.id.tv_webview).setOnClickListener(this);
     }
 }

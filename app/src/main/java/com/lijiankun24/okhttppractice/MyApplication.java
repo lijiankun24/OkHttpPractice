@@ -3,6 +3,7 @@ package com.lijiankun24.okhttppractice;
 import android.app.Application;
 
 import com.lijiankun24.okhttppractice.utils.MobileUtil;
+import com.lijiankun24.okhttppractice.webview.WebViewManager;
 
 /**
  * MyApplication.java
@@ -23,5 +24,6 @@ public class MyApplication extends Application {
         super.onCreate();
         INSTANCE = this;
         MobileUtil.init(this);
+        WebViewManager.getInstance().init(6, this);
     }
 }
