@@ -3,22 +3,16 @@ package com.lijiankun24.okhttppractice.activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
+import android.webkit.JsPromptResult;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.LinearLayout;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.GlideBuilder;
-import com.lijiankun24.okhttppractice.MyApplication;
 import com.lijiankun24.okhttppractice.R;
 import com.lijiankun24.okhttppractice.utils.L;
-import com.lijiankun24.okhttppractice.webview.WebViewManager;
 
 public class WebViewActivity extends AppCompatActivity {
-
-    private WebView mWebView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,34 +22,68 @@ public class WebViewActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.ll_webview_root);
-        mWebView = WebViewManager.getInstance().getWebView(MyApplication.getInstance());
-        if (mWebView == null) {
-            return;
-        }
-        linearLayout.addView(mWebView);
+        WebView mWebView = (WebView) findViewById(R.id.webview);
         mWebView.getSettings().setJavaScriptEnabled(true);
-        mWebView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
-        mWebView.getSettings().setDatabaseEnabled(true);
-        mWebView.getSettings().setDomStorageEnabled(true);
-        mWebView.getSettings().setAppCacheEnabled(true);
 
         mWebView.setWebViewClient(new MyWebViewClient());
-        mWebView.loadUrl("https://ke.youdao.com");
+        mWebView.setWebChromeClient(new MyWebChromeClient());
+        mWebView.loadUrl("http://gank.io/");
     }
 
     private class MyWebViewClient extends WebViewClient {
 
         @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            view.loadUrl(url);
+            return true;
+        }
+
+        /*@Override
         public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
             L.i("url is " + url);
             if (isImageResUrl(url) || url.contains("image")) {
                 L.i("image url is " + url);
-
+                WebResourceResponse response = super.shouldInterceptRequest(view, url);
+                InputStream inputStream = response.getData();
+                return response;
             } else {
                 return super.shouldInterceptRequest(view, url);
             }
-            return super.shouldInterceptRequest(view, url);
+        }*/
+    }
+
+    private class MyWebChromeClient extends WebChromeClient {
+
+        @Override
+        public void onReceivedTitle(WebView view, String title) {
+            L.i("onReceivedTitle title is " + title);
+            view.loadUrl("javascript:" +
+                    "window.addEventListener('DOMContentLoaded', function() {" +
+                    "alert('domc:' + new Date().getTime()); " +
+                    "})");
+        }
+
+        @Override
+        public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+            L.i("**** Blocking Javascript onJsAlert :" + message);
+            return super.onJsAlert(view, url, message, result);
+        }
+
+        @Override
+        public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+            L.i("**** Blocking Javascript Prompt :" + message);
+//            if (message != null) {
+//                if (!preCacheRun) {
+//                    String[] strs = message.split(":");
+//                    if (2 == strs.length) {
+//                        if ("domc".equals(strs[0])) {
+//                            result.getCurrentRun().setDocComplete(Long.valueOf(strs[1].trim()));
+//                        }
+//                    }
+//                }
+//            }
+//            r.confirm(defaultValue);
+            return super.onJsPrompt(view, url, message, defaultValue, result);
         }
     }
 
