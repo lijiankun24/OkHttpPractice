@@ -6,11 +6,19 @@ import android.text.TextUtils;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.lijiankun24.okhttppractice.R;
 import com.lijiankun24.okhttppractice.utils.L;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class WebViewActivity extends AppCompatActivity {
 
@@ -38,18 +46,40 @@ public class WebViewActivity extends AppCompatActivity {
             return true;
         }
 
-        /*@Override
+        /*
+        @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
             L.i("url is " + url);
+            WebResourceResponse response;
             if (isImageResUrl(url) || url.contains("image")) {
-                L.i("image url is " + url);
-                WebResourceResponse response = super.shouldInterceptRequest(view, url);
-                InputStream inputStream = response.getData();
-                return response;
+                File file;
+                boolean isFromNet = true;
+                file = ImageLoader.getInstance().getDiskCache().get(url);
+                if (file != null) {
+                    try {
+                        response = new WebResourceResponse("image/png", "gzip", new FileInputStream(file));
+                        isFromNet = false;
+                    } catch (IOException e) {
+                        response = super.shouldInterceptRequest(view, url);
+                    }
+                } else {
+                    response = super.shouldInterceptRequest(view, url);
+
+                }
+                if (isFromNet && response != null) {
+                    try {
+                        InputStream inputStream = response.getData();
+                        ImageLoader.getInstance().getDiskCache().save(url, inputStream, null);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             } else {
-                return super.shouldInterceptRequest(view, url);
+                response = super.shouldInterceptRequest(view, url);
             }
-        }*/
+            return response;
+        }
+        */
     }
 
     private class MyWebChromeClient extends WebChromeClient {

@@ -16,7 +16,9 @@ import java.text.SimpleDateFormat;
 
 public class Util {
 
-    private static String filenameTemp = Environment.getExternalStorageDirectory().getAbsolutePath() + "/CourseApi.txt";
+    public static String filenameTemp = Environment.getExternalStorageDirectory().getAbsolutePath() + "/CourseApi.txt";
+
+    public static String IMAGECACHEPATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/OkHttpImage/";
 
     public static void createFile() {
         File dir = new File(filenameTemp);

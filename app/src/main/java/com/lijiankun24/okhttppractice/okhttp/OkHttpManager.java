@@ -62,7 +62,7 @@ public class OkHttpManager {
         return INSTANCE;
     }
 
-    private OkHttpClient getHttpClient() {
+    public OkHttpClient getHttpClient() {
         return sHttpClient;
     }
 
