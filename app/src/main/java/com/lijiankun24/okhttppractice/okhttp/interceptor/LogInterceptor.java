@@ -42,7 +42,7 @@ public class LogInterceptor implements Interceptor {
                 .concat("\nrequest header == " + request.headers())
                 .concat("\nrequest ========= " + bodyToString(request.body()))
                 .concat("\nbody ============ " + buffer.clone().readString(UTF8));
-        L.i("log is " + log);
+//        L.i("log is " + log);
         return response;
     }
 

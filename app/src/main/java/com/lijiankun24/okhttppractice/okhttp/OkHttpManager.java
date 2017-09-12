@@ -14,11 +14,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.SecureRandom;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -40,15 +43,15 @@ public class OkHttpManager {
     private static OkHttpClient sHttpClient = null;
 
     private OkHttpManager(Context context) {
-        sHttpClient = new OkHttpClient.Builder()
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .cache(CustomCache.getCache())
                 .cookieJar(new CustomCookieJar(context))
                 .addNetworkInterceptor(new NetCacheInterceptor())
                 .addInterceptor(new LocalCacheInterceptor())
                 .addInterceptor(new HeaderInterceptor())
-                .addInterceptor(new LogInterceptor())
-                .sslSocketFactory(getCertificates())
-                .build();
+                .addInterceptor(new LogInterceptor());
+        setSSL(builder);
+        sHttpClient = builder.build();
     }
 
     public static OkHttpManager getInstance(Context context) {
@@ -88,6 +91,37 @@ public class OkHttpManager {
         });
     }
 
+    private void setSSL(OkHttpClient.Builder builder) {
+        try {
+            final TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        @Override
+                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                        }
+
+                        @Override
+                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                        }
+
+                        @Override
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return new java.security.cert.X509Certificate[]{};
+                        }
+                    }
+            };
+
+            // Install the all-trusting trust manager
+            final SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+            // Create an ssl socket factory with our all-trusting manager
+            final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private SSLSocketFactory getCertificates() {
         InputStream inputStream = null;
         try {
@@ -95,7 +129,7 @@ public class OkHttpManager {
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(null);
-            keyStore.setCertificateEntry("1", certificateFactory.generateCertificate(inputStream));
+            keyStore.setCertificateEntry("1", certificateFactory.generateCertificate(null));
             SSLContext sslContext = SSLContext.getInstance("TLS");
             TrustManagerFactory trustManagerFactory =
                     TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());

@@ -26,6 +26,6 @@ public class MyApplication extends Application {
         INSTANCE = this;
         MobileUtil.init(this);
         WebViewManager.getInstance().init(6, this);
-        ImageLoaderManager.init(this);
+        ImageLoaderManager.getInstance().init(this);
     }
 }
