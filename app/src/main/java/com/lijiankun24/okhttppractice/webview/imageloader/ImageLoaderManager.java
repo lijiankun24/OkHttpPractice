@@ -2,6 +2,8 @@ package com.lijiankun24.okhttppractice.webview.imageloader;
 
 import android.content.Context;
 
+import com.lijiankun24.okhttppractice.webview.util.Md5Util;
+import com.lijiankun24.okhttppractice.webview.util.StreamUtil;
 import com.nostra13.universalimageloader.cache.disc.DiskCache;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -22,7 +24,7 @@ public class ImageLoaderManager {
 
     private static ImageLoaderManager INSTANCE = null;
 
-    private static String IMAGECACHEPATH = null;
+    private static DiskCache mDiskCache = null;
 
     private ImageLoaderManager() {
     }
@@ -38,13 +40,11 @@ public class ImageLoaderManager {
         return INSTANCE;
     }
 
-    public static DiskCache mDiskCache = null;
-
     public void init(Context context) {
-        IMAGECACHEPATH = context.getExternalCacheDir().getAbsolutePath() + "/OkHttpImage/";
-        File file = new File(IMAGECACHEPATH);
+        String imageCachePath = context.getExternalCacheDir().getAbsolutePath() + "/ImageCache/";
+        File file = new File(imageCachePath);
         if (!file.exists()) {
-            file.mkdir();
+            file.mkdirs();
         }
         mDiskCache = new UnlimitedDiskCache(file);
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
@@ -56,16 +56,20 @@ public class ImageLoaderManager {
     public InputStream getDiskCache(String url) {
         InputStream inputStream = null;
         try {
+            url = Md5Util.md5(url);
             File file = mDiskCache.get(url);
             inputStream = new FileInputStream(file);
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            StreamUtil.safeClose(inputStream);
         }
         return inputStream;
     }
 
     public void saveDiskCache(String url, InputStream inputStream) {
         try {
+            url = Md5Util.md5(url);
             mDiskCache.save(url, inputStream, null);
         } catch (IOException e) {
             e.printStackTrace();
