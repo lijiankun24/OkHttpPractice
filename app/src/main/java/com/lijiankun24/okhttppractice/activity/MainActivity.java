@@ -9,6 +9,7 @@ import com.lijiankun24.okhttppractice.R;
 import com.lijiankun24.okhttppractice.okhttp.OkHttpManager;
 import com.lijiankun24.okhttppractice.okhttp.OnHttpListener;
 import com.lijiankun24.okhttppractice.utils.L;
+import com.lijiankun24.okhttppractice.webview.glide.GlideApp;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -23,6 +24,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
+        GlideApp.with(this);
+//        LightWebCache.enableGlide(getApplicationContext());
     }
 
     @Override

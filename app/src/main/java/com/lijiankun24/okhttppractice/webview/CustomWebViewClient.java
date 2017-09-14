@@ -10,7 +10,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.lijiankun24.okhttppractice.okhttp.OkHttpManager;
-import com.lijiankun24.okhttppractice.webview.imageloader.ImageLoaderManager;
+import com.lijiankun24.okhttppractice.utils.L;
+import com.lijiankun24.okhttppractice.webview.glide.CustomGlideModule;
 import com.lijiankun24.okhttppractice.webview.util.WebResourceInputStream;
 
 import java.io.InputStream;
@@ -64,11 +65,15 @@ public class CustomWebViewClient extends WebViewClient {
         if (isImage(url) || url.contains("image")) {
             String ext = MimeTypeMap.getFileExtensionFromUrl(url);
             String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
-            InputStream inputStream = ImageLoaderManager.getInstance().getDiskCache(url);
+//            InputStream inputStream = ImageLoaderManager.getInstance().getDiskCache(url);
+            InputStream inputStream = CustomGlideModule.getInstance().get(url);
+
             if (inputStream != null) {
+                L.i("inputStream != null");
                 response = new WebResourceResponse(mimeType, "utf-8", inputStream);
             } else {
                 try {
+                    L.i("inputStream == null");
                     Request request = new Request.Builder()
                             .url(url)
                             .build();

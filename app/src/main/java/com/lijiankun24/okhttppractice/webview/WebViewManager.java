@@ -40,10 +40,10 @@ public class WebViewManager {
     }
 
     public synchronized void init(int maxCount, Context context) {
+        mContext = context.getApplicationContext();
         mMaxWebViewCount = maxCount;
         mDefaultWebViewFactory = new DefaultWebviewFactory();
         mWebViewCache = new LinkedList<>();
-        mContext = context;
         Handler handler = new Handler(Looper.getMainLooper());
         WebViewCreationTask task = new WebViewCreationTask(context);
         handler.post(task);

@@ -3,6 +3,7 @@ package com.lijiankun24.okhttppractice.webview.util;
 import android.support.annotation.NonNull;
 
 import com.lijiankun24.okhttppractice.utils.L;
+import com.lijiankun24.okhttppractice.webview.glide.CustomGlideModule;
 import com.lijiankun24.okhttppractice.webview.imageloader.ImageLoaderManager;
 
 import java.io.ByteArrayInputStream;
@@ -21,6 +22,7 @@ public class WebResourceInputStream extends InputStream {
     private ByteArrayOutputStream mOutputStream = null;
     private InputStream mInnerIs = null;
     private String mImageName = null;
+    private String mUrl = null;
     private int mCurrentLen = 0;
     private int mContentLen = 0;
 
@@ -29,6 +31,7 @@ public class WebResourceInputStream extends InputStream {
         this.mContentLen = contentLength;
         this.mInnerIs = is;
         mImageName = Md5Util.md5(url);
+        mUrl = url;
         mOutputStream = new ByteArrayOutputStream();
     }
 
@@ -96,7 +99,8 @@ public class WebResourceInputStream extends InputStream {
                 if (mCurrentLen == mContentLen) {
                     mOutputStream.flush();
                     inputStream = new ByteArrayInputStream(mOutputStream.toByteArray());
-                    ImageLoaderManager.getInstance().saveDiskCache(mImageName, inputStream);
+                    CustomGlideModule.getInstance().putCacheFile(mUrl, inputStream);
+//                    ImageLoaderManager.getInstance().saveDiskCache(mImageName, inputStream);
                 }
             }
         } catch (Exception e) {
