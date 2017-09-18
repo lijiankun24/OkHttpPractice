@@ -5,12 +5,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.lijiankun24.okhttppractice.R;
 import com.lijiankun24.okhttppractice.okhttp.OkHttpManager;
 import com.lijiankun24.okhttppractice.okhttp.OnHttpListener;
+import com.lijiankun24.okhttppractice.utils.L;
 import com.lijiankun24.okhttppractice.webview.CustomWebChromeClient;
 import com.lijiankun24.okhttppractice.webview.CustomWebViewClient;
 import com.lijiankun24.okhttppractice.webview.WebViewManager;
@@ -42,23 +45,24 @@ public class WebViewActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (linearLayout != null && mWebView != null) {
-            linearLayout.removeView(mWebView);
-            mWebView.stopLoading();
-            mWebView.removeAllViews();
-            mWebView.removeAllViewsInLayout();
-        }
+//        if (linearLayout != null && mWebView != null) {
+//            linearLayout.removeView(mWebView);
+//            mWebView.stopLoading();
+//            mWebView.removeAllViews();
+//            mWebView.removeAllViewsInLayout();
+//        }
     }
 
     private void initView() {
         linearLayout = (LinearLayout) findViewById(R.id.ll_webview_root);
-//        WebView mWebView = (WebView) findViewById(R.id.webview);
+        WebView mWebView = (WebView) findViewById(R.id.webview);
         long startTime = System.currentTimeMillis();
-        mWebView = WebViewManager.getInstance().getWebView(this.getApplicationContext());
+//        mWebView = WebViewManager.getInstance().getWebView(this.getApplicationContext());
 //        WebView mWebView = new WebView(this);
-        linearLayout.addView(mWebView);
-        mWebView.getSettings().setJavaScriptEnabled(true);
+//        linearLayout.addView(mWebView);
 
+        mWebView.getSettings().setJavaScriptEnabled(true);
+//        mWebView.getSettings().setDefaultTextEncodingName("utf-8");
         mWebView.setWebViewClient(new CustomWebViewClient(WebViewActivity.this));
        /* mWebView.setWebViewClient(new WebViewClient() {
 
@@ -76,11 +80,26 @@ public class WebViewActivity extends AppCompatActivity {
             }
         });*/
         mWebView.setWebChromeClient(new CustomWebChromeClient(startTime));
-        loadHtml();
+        mWebView.loadUrl("file:///android_asset/AndroidAnd.html");
+        mWebView.addJavascriptInterface(this, "android");
+//        mWebView.loadUrl("http://c.youdao.com/test/taoym/index.html");
+//        mWebView.loadUrl("https://www.baidu.com");
+//        loadHtml();
 //        mWebView.setWebViewClient(new LightWebViewClient());
 //        mWebView.loadUrl("https://ke.youdao.com");
 //        mWebView.reload();
     }
+
+    @JavascriptInterface
+    public void goToLogin(String msg) {
+        L.i("msg is " + msg);
+        Toast.makeText(this, "goToLogin方法被调用" + msg, Toast.LENGTH_LONG).show();
+    }
+//
+//    @JavascriptInterface
+//    public void goToLogin() {
+//        Toast.makeText(this, "goToLogin方法被调用 null", Toast.LENGTH_LONG).show();
+//    }
 
     private void loadHtml() {
         OkHttpManager.getInstance(WebViewActivity.this).addGetStringRequest("https://ke.youdao.com", new OnHttpListener<String>() {

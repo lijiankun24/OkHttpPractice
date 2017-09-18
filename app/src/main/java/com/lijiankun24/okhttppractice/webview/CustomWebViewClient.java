@@ -48,17 +48,17 @@ public class CustomWebViewClient extends WebViewClient {
         view.loadUrl(url);
         return true;
     }
-
-    @TargetApi(21)
-    @Override
-    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-        return getResponseFromCache(request.getUrl().toString());
-    }
-
-    @Override
-    public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-        return getResponseFromCache(url);
-    }
+//
+//    @TargetApi(21)
+//    @Override
+//    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+//        return getResponseFromCache(request.getUrl().toString());
+//    }
+//
+//    @Override
+//    public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+//        return getResponseFromCache(url);
+//    }
 
     private WebResourceResponse getResponseFromCache(String url) {
         WebResourceResponse response = null;

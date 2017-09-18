@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+this is html
+
+
+<script type="text/javascript">
+function clickButton(){
+    var json = window.performance.timing;
+    var msg = JSON.stringify(json);
+    //var msg = "test";
+    window.android.goToLogin(msg);
+}
+</script>
+
+<button type="button" onclick="clickButton()">点击这里</button>
+</body>
+</html>

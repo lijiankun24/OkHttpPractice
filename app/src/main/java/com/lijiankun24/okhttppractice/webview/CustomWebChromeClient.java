@@ -25,7 +25,7 @@ public class CustomWebChromeClient extends WebChromeClient {
     @Override
     public void onReceivedTitle (WebView view, String title) {
         Log.i("lijk", "init WebView time is " + (System.currentTimeMillis() - mStartTime));
-        registerOnLoadHandler(view);
+//        registerOnLoadHandler(view);
 //        set(view);
     }
 
